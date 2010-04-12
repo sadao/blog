@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:media="http://search.yahoo.com/mrss/"
+    xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        {% for photo in photos %}
+        <item>
+            <title>{{photo.title.text}}</title>
+            <media:description>{{photo.description.text}}</media:description>
+            <link>{{photo.content.src}}?imgmax=800</link>
+             {% for thumbnail in photo.media.thumbnail%}
+                 {% ifequal forloop.counter 2 %}
+                 <media:thumbnail url="{{thumbnail.url}}" type="image/jpeg"/>
+                 {% endifequal %}
+             {% endfor %}
+            <media:content url="{{photo.content.src}}?imgmax=800" type="image/jpeg"/>
+        </item>
+        {% endfor %}
+    </channel>
+</rss>

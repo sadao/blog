@@ -1,0 +1,10 @@
+{% load i18n %}
+<DIV id=menu_right>
+    <div id="subscribe">
+      <a href="/atom" target="_blank"><img src="/img/feed-icon-16x16.png" alt="Subscribe to this blog">{% trans "Subscribe to this blog." %} </a>
+    </div>
+{% include "include/featured_recent.html" %}    
+{% include "include/comment_recent.html" %}
+{% include "include/archive_list.html" %}
+{% include "include/google_ad.html" %}
+</DIV>

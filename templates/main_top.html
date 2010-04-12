@@ -1,0 +1,61 @@
+{% load i18n %}
+<div class="menu_top">
+    <div id="userinfo">
+        {% if user %}
+                {% if user.email %}
+                    <b>{{ user.email }}</b> |
+                {% endif %}
+                    <a href="/user">{% trans "My Account" %}</a> |
+                {% if user_is_admin %}
+                    <a href='/admin'>{% trans "System Configuration" %}</a> |
+                    <a href='http://appengine.google.com/' target="_blank">Appengine</a> |
+                {% endif %}
+            <a href="/logout">{% trans "Sign out" %}</a> 
+        {% else %}
+            <a href="/signup">{% trans "Join now" %}</a> |
+            {% trans "Already a user?" %} <a href="/login">{% trans "Sign in" %}</a>
+        {% endif %}
+    </div>
+    <div>
+        <div class="yui-g">
+        <div class="yui-u first">
+            <div id="title" style="vertical-align:top;">
+                <a href="/"><img src="{{BLOG.site_logo}}" alt="{{BLOG.title}}"
+                                 style="vertical-align:middle;padding-right:5px"></a>
+                <span id="description_next">{% if BLOG.description_next_logo %}{{BLOG.description}}{% endif %}</span>
+            </div>
+        </div>
+        <div class="yui-u">
+            <form method="get" action="/search_google" target="_top">
+            <div align="right" style="padding-top:10px">
+                <script type="text/javascript">
+                    function searchSite(){
+                        var q = document.forms[0]["q"].value;
+                        window.location.href = "/search/"+q;
+                    }
+                </script>
+                <!-- Search Google -->
+                <table bgcolor="#ffffff">
+                <tr><td nowrap="nowrap" valign="top" align="left" height="32">
+
+                <label for="sbi" style="display: none">Enter your search terms</label>
+                <input type="text" name="q" size="31" maxlength="255" value="{%if search_term%}{{search_term|unquote|escape}}{%endif%}" id="sbi"></input>
+                <label for="sbb" style="display: none">Submit search form</label>
+                <INPUT type="button" value="Search site" name=projectsearch onclick="searchSite()">
+                <input type="submit" name="sa" value="Google Search" id="sbb"></input>
+                <input type="hidden" name="client" value="pub-1257602387207870"></input>
+                <input type="hidden" name="forid" value="1"></input>
+                <input type="hidden" name="ie" value="UTF-8"></input>
+                <input type="hidden" name="oe" value="UTF-8"></input>
+                <input type="hidden" name="safe" value="active"></input>
+                <input type="hidden" name="cof" value="GALT:#333333;GL:1;DIV:#CCCCCC;VLC:555555;AH:center;BGC:FFFFFF;LBGC:336699;ALC:5F9EA0;LC:5F9EA0;T:333333;GFNT:555555;GIMP:555555;FORID:11"></input>
+                <input type="hidden" name="hl" value="en"></input>
+                </td></tr></table>
+                <!-- Search Google -->
+            </div>
+            </form>                
+        </div>
+        </div>
+    </div>
+</div>
+{% include "include/menu_navigator.html"%}

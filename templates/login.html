@@ -1,0 +1,68 @@
+{% extends "main.html" %}
+{% block title %}{{title}} - Login{% endblock %}
+{% block blogcontainer %}
+<div id="logindiv">
+    <div class="yui-g">
+        {% if error %}
+        <div class="error">
+            {{error}}
+        </div>
+        {% endif %}
+    </div>
+    <div class="yui-g">
+        <div class="yui-u first">
+            Sign In
+            <form method=post id="signinForm" name="signinForm" action="/login">
+                <table cellspacing="0" class="yui-skin-sam noborder_table">
+                    <tbody>
+                        <tr>
+                            <th><label for="email">E-mail / Username:</label></th>
+                            <td><input type="text" id="email" value="{%if email%}{{email}}{%endif%}" name="email"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Password:</th>
+                            <td><input type="password" name="password" id="password"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th></th>
+                            <td>
+                                <input name="keeplive" id="keeplive" value="1" type="checkbox">
+                                <label for="keeplive">Remember me</label><br>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th></th>
+                            <td style="line-height: 21px; padding-left: 6px;">
+                                <div style="margin: 10px 10px 10px 0pt; float: right; line-height: 21px;">
+                                    <a tabindex="100" style="font-size: 10px; line-height: 21px;" href="/lost_password">Forgot password?</a>
+                                </div>
+                                <input type="submit" value="Sign in"/></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </form>
+        </div>
+        <div class="yui-u">
+            Not a member yet?
+            <a href="/signup">Sign up now</a>
+        </div>
+    </div>
+
+    <br>
+
+    <div>
+        <div><strong>Other ways to sign in:</strong></div>
+        <img height="16" align="absmiddle" width="16" style="margin-right: 3px;" src="/img/openid.gif"/>
+        <a href="/login/openid">Sign in with OpenID</a> <br/>
+        <img height="16" align="absmiddle" width="16" style="margin-right: 3px;" src="/img/google.gif"/>
+        {% if google_login_status %}
+        <a href="{{google_logout_url}}">Sign Out with Google Account</a>
+        {% else %}
+        <a href="{{google_login_url}}">Sign in with Google Account</a>
+        {% endif %} <br/>
+    </div>
+</div>
+{% endblock %}
+

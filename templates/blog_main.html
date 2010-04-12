@@ -1,0 +1,8 @@
+{% load i18n %}
+{% extends "main.html" %}
+{% block title %}{{title}}{% endblock %}
+{% block blog %}
+    {% include "include/blog_list_main.html" %}
+    {% include "include/paginator.html" %}
+{% endblock %}
+

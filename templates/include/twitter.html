@@ -1,0 +1,36 @@
+{% load i18n %}
+<div id="twitter">
+
+<script src="http://widgets.twimg.com/j/2/widget.js"></script>
+<script>
+new TWTR.Widget({
+  version: 2,
+  type: 'profile',
+  rpp: 4,
+  interval: 6000,
+  width: 200,
+  height: 300,
+  theme: {
+    shell: {
+      background: '#b3afb3',
+      color: '#ffffff'
+    },
+    tweets: {
+      background: '#f7f4f7',
+      color: '#5acded',
+      links: '#4aed05'
+    }
+  },
+  features: {
+    scrollbar: false,
+    loop: false,
+    live: false,
+    hashtags: true,
+    timestamp: true,
+    avatars: false,
+    behavior: 'all'
+  }
+}).render().setUser('ringio').start();
+</script>
+
+</div>

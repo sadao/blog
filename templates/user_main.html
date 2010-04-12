@@ -1,0 +1,87 @@
+{% load i18n %}
+{% extends "main.html" %}
+{% block title %}{{title}} - User Profile {% endblock %}
+{% block blogcontainer %}
+<!-- Connection Manager -->
+<script src="http://yui.yahooapis.com/2.7.0/build/connection/connection-min.js"></script>
+<!-- JSON Utility -->
+<script src="http://yui.yahooapis.com/2.7.0/build/json/json-min.js"></script>
+
+<!--DataTable-->
+<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.7.0/build/datatable/assets/skins/sam/datatable.css" />
+<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.7.0/build/tabview/assets/skins/sam/tabview.css" />
+
+<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/element/element-min.js"></script>
+<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/datasource/datasource-min.js"></script>
+<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/datatable/datatable-min.js"></script>
+
+<!--tabview-->
+<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/tabview/tabview-min.js"></script>
+
+<!--Resizable panel-->
+<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.7.0/build/container/assets/skins/sam/container.css" />
+<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.7.0/build/resize/assets/skins/sam/resize.css" />
+<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/utilities/utilities.js"></script>
+<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/container/container.js"></script>
+<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/resize/resize.js"></script>
+
+<script type="text/javascript" src="/jscripts/common/constant.js"></script>
+<script type="text/javascript" src="/jscripts/common/utils.js"></script>
+<script type="text/javascript" src="/jscripts/user.form.js"></script>
+        
+<script type="text/javascript" src="/jscripts/openid-selector.js"></script>
+
+<script type="text/javascript">
+    function deleteOpenid(openid){
+        var sUrl = "/rpc?action=DeleteOpenID&openid=" + encodeURI(openid) +
+                   "&time=" + new Date().getTime();
+        var deleteOpenIDSuccess = function(o) {
+            if (o.responseText !== undefined) {
+                var src_obj = document.getElementById(o.argument.openid);
+                document.getElementById("openIDTable").deleteRow(src_obj.parentNode.parentNode.rowIndex);
+                alert("Delete openID successfully.");
+            }
+        };
+        var callback =
+        {
+            success:deleteOpenIDSuccess,
+            failure:handleFailure,
+            argument:{openid:openid}
+        };
+        YAHOO.util.Connect.asyncRequest('POST', sUrl, callback);
+    }
+</script>
+{% block jscript %}
+{% endblock %}
+<div class="yui-g">
+    <div id="admincontainer" class=" yui-skin-sam">
+        <div id="usermenu">
+        </div>
+        <script type="text/javascript">
+            (function() {
+                var tabView = new YAHOO.widget.TabView();
+
+                var profileTab = new YAHOO.widget.Tab({
+                    label: 'Profile',
+                    dataSrc: '/user/profile',
+                    cacheData: true,
+                    active: true
+                });
+                tabView.addTab(profileTab);
+
+                var socialTab = new YAHOO.widget.Tab({
+                    label: 'Social Network',
+                    dataSrc: '/user/social',
+                    cacheData: true
+                });
+                tabView.addTab(socialTab);
+
+                YAHOO.util.Event.onContentReady('usermenu', function() {
+                    tabView.appendTo('usermenu');
+                });
+            })();
+        </script>
+    </div>
+</div>
+{% endblock %}
+

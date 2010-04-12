@@ -1,0 +1,322 @@
+{% load i18n %}
+{% extends "main.html" %}
+
+{% block title %}{{title}} -  
+	{% ifequal action "addBlog" %}
+		{% trans "Add" %} 
+		{% ifequal entrytype "blog"%}{% trans "Blog" %}{% endifequal %}
+		{% ifequal entrytype "page"%}{% trans "Page" %}{% endifequal %}
+	{% endifequal %}
+	{% ifequal action "editBlog" %}
+		{% trans "Edit item" %}
+	{% endifequal %}
+	{% ifequal action "editBlogReaction" %}
+		{% trans "Edit reaction" %}
+	{% endifequal %}
+{% endblock %}
+
+{% block blogcontainer %}
+
+<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.7.0/build/menu/assets/skins/sam/menu.css" />
+<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.7.0/build/button/assets/skins/sam/button.css" />
+<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.7.0/build/fonts/fonts-min.css" />
+<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.7.0/build/container/assets/skins/sam/container.css" />
+
+<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.7.0/build/editor/assets/skins/sam/editor.css" />
+<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/animation/animation-min.js"></script>
+<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/element/element-min.js"></script>
+<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/container/container-min.js"></script>
+<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/menu/menu-min.js"></script>
+<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/button/button-min.js"></script>
+<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/editor/editor-min.js"></script>
+<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/connection/connection-min.js"></script>
+
+<!--yui image uploader -->
+<script src="/jscripts/yui-image-uploader.js"></script>
+<script type="text/javascript" src="/jscripts/images-auto-resize.js"></script>
+        
+<style>
+    .yui-skin-sam .yui-toolbar-container .yui-toolbar-editcode span.yui-toolbar-icon {
+        background-image: url( /img/html_editor.gif );
+        background-position: 0 1px;
+        left: 5px;
+    }
+    .yui-skin-sam .yui-toolbar-container .yui-button-editcode-selected span.yui-toolbar-icon {
+        background-image: url( /img/html_editor.gif );
+        background-position: 0 1px;
+        left: 5px;
+    }
+    .editor-hidden {
+        visibility: hidden;
+        top: -9999px;
+        left: -9999px;
+        position: absolute;
+    }
+</style>
+
+<div class="yui-g">
+<script type="text/javascript">
+    String.prototype.trim = function () {
+        return this.replace(/^[\s\,]*/, "").replace(/[\s\,]*$/, ""); //for remove the space and comma at the begining/end of the tag.
+    };
+
+    (function() {
+        var Dom = YAHOO.util.Dom,
+            Event = YAHOO.util.Event;
+        var myConfig = {
+            height: '300px',
+            width: '650px',
+            dompath: true
+        };
+        var state = 'off';        
+        var myEditor = new YAHOO.widget.Editor('text_input', myConfig);
+        myEditor.on('toolbarLoaded', function() {
+            var codeConfig = {
+                type: 'push', label: 'Edit HTML Code', value: 'editcode'
+            };
+            this.toolbar.addButtonToGroup(codeConfig, 'insertitem');
+            this.toolbar.on('editcodeClick', function() {
+                var ta = this.get('element'),
+                        iframe = this.get('iframe').get('element');
+                if (state == 'on') {
+                    state = 'off';
+                    this.toolbar.set('disabled', false);
+                    this.setEditorHTML(ta.value);
+                    if (!this.browser.ie) {
+                        this._setDesignMode('on');
+                    }
+
+                    Dom.removeClass(iframe, 'editor-hidden');
+                    Dom.addClass(ta, 'editor-hidden');
+                    this.show();
+                    this._focusWindow();
+                } else {
+                    state = 'on';
+                    this.cleanHTML();
+                    Dom.addClass(iframe, 'editor-hidden');
+                    Dom.removeClass(ta, 'editor-hidden');
+                    this.toolbar.set('disabled', true);
+                    this.toolbar.getButtonByValue('editcode').set('disabled', false);
+                    this.toolbar.selectButton('editcode');
+                    this.dompath.innerHTML = 'Editing HTML Code';
+                    this.hide();
+                }
+                return false;
+            }, this, true);
+
+            this.on('cleanHTML', function(ev) {
+                var holder = document.createElement('div');
+                holder.innerHTML = ev.html;
+                var pre = holder.getElementsByTagName('pre');
+                for (var i = 0; i < pre.length; i++) {
+                    pre[i].innerHTML = pre[i].innerHTML.replace(/<br>/g, "\n");
+                }
+                this.get('element').value = holder.innerHTML;
+            }, this, true);
+
+            this.on('afterRender', function() {
+                var wrapper = this.get('editor_wrapper');
+                wrapper.appendChild(this.get('element'));
+                this.setStyle('width', '100%');
+                this.setStyle('height', '100%');
+                this.setStyle('visibility', '');
+                this.setStyle('top', '');
+                this.setStyle('left', '');
+                this.setStyle('position', '');
+
+                this.addClass('editor-hidden');
+            }, this, true);
+        }, myEditor, true);
+
+        yuiImgUploader(myEditor, '/rpc/uploadImage','img');
+        myEditor._defaultToolbar.buttonType = 'basic';
+        myEditor.render();
+
+        var parseBlogContent = function parseBlogContent(){
+            //form validator:
+            {% ifequal action "editBlogReaction" %}
+                 var name_input = document.forms["previewForm"]["name_input"];
+                 if(name_input.value==""){
+                     alert("Please input your name.");
+                     name_input.focus();
+                     YAHOO.util.Event.preventDefault();
+                     return false;
+                 }
+                 var mail = document.forms["previewForm"]["mail"];
+                 if(mail.value==""){
+                     alert("Please input your email address.");
+                     mail.focus();
+                     YAHOO.util.Event.preventDefault();
+                     return false;
+                 }
+            {% else %}
+                var title_input = document.forms["previewForm"]["title_input"];
+                var tags = document.forms["previewForm"]["tags"];
+                tags.value = tags.value.trim();
+                if(title_input.value==""){
+                    alert("Please input title of the item.");
+                    title_input.focus();
+                    YAHOO.util.Event.preventDefault();
+                    return false;
+                }
+                if(tags.value.indexOf(" ")!=-1){
+                    alert("Please remove the space or replace it with '_' in the tags.");
+                    tags.focus();
+                    YAHOO.util.Event.preventDefault();
+                    return false;
+                }
+            {% endifequal %}
+
+            //save editor html.
+            var html = myEditor.saveHTML();
+            var holder = document.createElement('div');
+            holder.innerHTML = html;
+            var pre = holder.getElementsByTagName('pre');
+            for (var i = 0; i < pre.length; i++) {
+                pre[i].innerHTML = pre[i].innerHTML.replace(/<br>/g, "\n");
+            }
+            myEditor.setEditorHTML(holder.innerHTML);
+            myEditor.saveHTML();
+            return true;
+        };
+        YAHOO.util.Event.addListener("previewForm","submit",parseBlogContent);
+
+    })();
+
+</script>
+<div id="blogview">
+     {% if error %}
+    <div class="error">
+        {{error}}
+    </div>
+     {% endif %}
+    <div>
+    <form method=post id="previewForm">
+        <h4>
+            {% ifequal action "addBlog" %}
+            {% trans "Add" %} {% ifequal entrytype "blog"%}{% trans "Blog" %}{% endifequal %}{% ifequal entrytype "page"%}{% trans "Page" %}{% endifequal %}
+            {% endifequal %}
+            {% ifequal action "editBlog" %}
+            {% trans "Edit item" %}
+            {% endifequal %}
+            {% ifequal action "editBlogReaction" %}
+            {% trans "Edit reaction" %}
+            {% endifequal %}
+        </h4>
+        {% ifnotequal action "editBlogReaction" %}
+        <div id="blogtitle" class="input">
+         <input name=title_input id="title_input" type=text size="60"
+               value='{% if blog %}{{blog.title}}{% endif %}'>
+            <label for="title_input"><b>{% trans "Title" %}</b>({% trans "required" %})</label>
+        </div>
+        <div id="blogtags" class="input">
+         <input type=text size="60" id="tags" name="tags" value="{% if blog %}{{blog.tags_commas}}{% endif %}">
+         <label for="tags"><b>{% trans "Tags" %}</b>({% trans "comma separated without space" %}) </label>
+        </div>
+        {% endifnotequal %}
+
+        {% ifequal action "editBlog"%}
+        {% ifequal blog.entrytype "page"%}
+        <div id="blogpermalink" class="input">
+         <input type=text size="60" id="permalink" name="permalink" value="{% if blog %}{{blog.permalink}}{% endif %}">
+         <label for="permalink"><b>{% trans "Permalink" %}</b> </label>
+        </div>
+        {% endifequal %}
+        {% endifequal %}
+
+        {% ifequal action "editBlogReaction" %}
+        <h2 class="comments-post">{% trans "About the author" %}</h2>
+        <div class="input">
+            <input id="name_input" name='name_input' type=text size="60" value="{% if blogReaction %}{{blogReaction.user}}{% endif %}">
+            <label for="name_input"><b>{% trans "Name" %}</b> ({% trans "required" %})</label>
+        </div>
+        <div class="input">
+            <input id="mail" name="mail" type=text size="60" value="{% if blogReaction %}{{blogReaction.authorEmail}}{% endif %}">
+            <label for="mail"><b>{% trans "Mail" %}</b> ({% trans "required" %})</label>
+        </div>
+        <div class="input">
+            <input id="website" name="website" type=text size="60" value="{% if blogReaction %}{{blogReaction.authorWebsite}}{% endif %}">
+            <label for="website"><b>{% trans "Website" %}</b></label>
+        </div>
+        {% endifequal %}
+
+        <div id="blogpost">
+        <h2>{% trans "Content" %}</h2>
+        <textarea id="text_input" name="text_input" rows="20" cols="75">
+            {% if blog %}{{blog.content}}{% endif %}
+            {% if blogReaction %}{{blogReaction.content}}{% endif %}
+        </textarea>
+        </div>
+        
+        {% ifequal action "editBlog" %}
+        {% if blog %}
+        <input name="blogId" type="hidden" value="{{blog.key.id}}">
+        {% endif %}
+        {% endifequal %}
+
+        {% ifequal action "editBlogReaction" %}
+        {% if blogReaction %}
+        <input name="blogReactionId" type="hidden" value="{{blogReaction.key.id}}">
+        {% endif %}
+        {% endifequal %}
+        <br>
+        {% ifequal action "addBlog" %}
+        <input name=submit_preview type=submit value=preview>
+        <input type="hidden" name="preview" value="1">
+        {% else %}
+        <input name=submit_edit type=submit value=submit>
+        {% endifequal %}
+        <br><br>
+    </form>
+    </div>
+    {% ifequal preview '1' %}
+    {% ifnotequal submitted '1' %}
+    <script type="text/javascript">
+        function parseConfirmContent() {
+            var content = document.getElementById('blogcontent').innerHTML;
+            document.forms["submitForm"]["text_input"].value = content;
+            document.forms["submitForm"]["submitted"].value = "1";
+            return true;
+        }
+    </script>
+    <div>
+    <form method=post onsubmit="return parseConfirmContent()" id="submitForm">
+        <H2 class=date-header>{{blog.date|timezone:BLOG.time_zone_offset|date:"l, F d, Y"}}</H2>
+        <DIV class="post">
+            <H3 class=post-title>
+                <a href="#">{{blog.title}}</a>
+            </H3>
+            <DIV class=post-body id="blogcontent">
+                {{blog.content}}
+            </DIV>
+            <DIV class=post-footer>
+                {% if blog.tags %}
+                <p>
+                    {% trans "Tags" %}:
+                    {% for tag in blog.tags %}
+                    <a href="/tag/{{ tag|unquote }}">{{ tag|unquote }}</a> {% if not forloop.last %},{% endif %}
+                    {% endfor %}
+                </p><br>
+                {% endif %}
+                <P>
+                    <SPAN class=post-author>{% blocktrans with blog.author as b_author %}Posted by {{ b_author }} at{% endblocktrans %} </SPAN>
+                   <SPAN class=post-timestamp>
+                       <A class=timestamp-link href="#">{{blog.date|timezone:BLOG.time_zone_offset|date:"H:i A"}}</A>
+                   </SPAN>
+                </P>
+                 <br>
+            </DIV>
+        </DIV>
+        <input name=title_input type=hidden value="{{blog.title}}">
+        <input name=tags type=hidden value="{{tags}}">
+        <input name=text_input type="hidden"/>
+        <input name=entrytype type="hidden" value="{{blog.entrytype}}"/>
+        <input name=submitted type=hidden value='0'>
+        <input name=submit_add type=submit value=submit> <br/> <br/>
+    </form>
+    </div>
+    {% endifnotequal%}
+    {% endifequal%}
+</div>
+</div>
+{% endblock %}

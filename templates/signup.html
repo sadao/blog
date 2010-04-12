@@ -1,0 +1,125 @@
+{% load i18n %}
+{% extends "main.html" %}
+{% block title %}{{title}} - Singup{% endblock %}
+{% block blogcontainer %}
+<!-- Source file -->
+<script src="http://yui.yahooapis.com/2.7.0/build/connection/connection-min.js"></script>
+<!-- JSON Utility -->
+<script src="http://yui.yahooapis.com/2.7.0/build/json/json-min.js"></script>
+
+<script type="text/javascript" src="/jscripts/common/constant.js"></script>
+<script type="text/javascript" src="/jscripts/common/utils.js"></script>
+<script type="text/javascript" src="/jscripts/user.form.js"></script>
+<div class="yui-g">
+<div id="logindiv">
+{% if error %}
+<div class="error">
+    {{error}}
+</div>
+{% endif %}
+<script type="text/javascript">
+    function doSigninExisting(property, value) {
+        location.href = '/login?' + property + '=' + encodeURIComponent(value);
+    };    
+</script>
+<div>
+{% trans "Sign Up Here (it's free!)" %}
+<form method=post id="userForm" name="userForm" action="/signup">
+ <input type="hidden"  id="userid" name="userid"/>    
+<table cellspacing="0" class="yui-skin-sam noborder_table">
+<tbody>
+<tr>
+    <th><label for="email">{% trans "E-mail address" %}:</label></th>
+    <td><input type="text" id="email" value="{%if temp_user%}{{temp_user.email}}{%endif%}" name="email" size="30"/>
+        <span id="checkEmailAlert"></span>
+    </td>
+</tr>
+<tr>
+    <th/>
+    <td><p style="display: none;" id="email_unavailable_text">
+        {% trans "That address has already been registered." %} <a href="javascript:doSigninExisting('email',document.getElementById('email').value);">
+        {% trans "Sign  in" %}</a> {% trans "or use a different address." %}
+    </p>
+    </td>
+</tr>
+<tr>
+    <th><label for="username">{% trans "Username" %}:</label></th>
+    <td><input type="text"  id="username" value="{%if temp_user%}{{temp_user.username}}{%endif%}" name="username" size="30"/>
+        <span id="checkUsernameAlert"></span> 
+    </td>
+</tr>
+<tr>
+    <th/>
+    <td><p style="display: none;" id="username_unavailable_text">
+        {% trans "That username has already been registered." %} <a href="javascript:doSigninExisting('username',document.getElementById('username').value);">
+        {% trans "Sign  in" %}</a> {% trans "or use a different username." %}
+    </p>
+    </td>
+</tr>
+<tr>
+    <th><label for="password">{% trans "Create a password" %}:</label></th>
+    <td><input type="password" id="password" maxlength="255" name="password" size="30"/>
+        <span id="checkPasswordAlert"></span>
+        <div id="password_unavailable_text"> {% trans "at least 6 characters (case sensitive)" %} </div>
+    </td>
+</tr>
+<tr>
+    <th><label for="firstname">{% trans "First Name" %}:</label>
+    </th>
+    <td><input type="text" id="firstname" size="30" value="{%if temp_user%}{{temp_user.firstname}}{%endif%}" name="firstname"/>
+        <span id="checkFirstNameAlert"></span></td>
+</tr>
+<tr>
+    <th><label for="lastname">{% trans "Last Name" %}:</label></th>
+    <td><input type="text" id="lastname" size="30" value="{%if temp_user%}{{temp_user.lastname}}{%endif%}" name="lastname"/>
+        <span id="checkLastNameAlert"/></td>
+</tr>
+<tr>
+    <th><label for="country">{% trans "Country" %}:</label></th>
+    <td>
+        <select id="country" name="country"/>
+        <input id="country_hidden" value="{%if temp_user and temp_user.country %}{{temp_user.country}}{% endif %}" type="hidden"/>
+    </td>
+</tr>
+<tr>
+    <th><label for="birthday">{% trans "Birthday" %}:</label></th>
+    <td>
+        <input name="birthday" id="birthday" type="hidden">
+        <select id="year" name="year" style="margin-right:5px"></select>
+        <select id="month" name="month" style="margin-right:5px"></select>
+        <select id="day" name="day"></select>
+    </td>
+</tr>
+<tr>
+    <th><label>{% trans "Gender" %}:</label></th>
+    <td>
+        <input type="radio" id="gender_Female"
+               value="Female" name="gender"/>
+        <label for="gender_Female">{% trans "Female" %}</label>
+        <input type="radio" id="gender_Male"
+               value="Male" name="gender"/><label for="gender_Male">{% trans "Male" %}</label>
+    </td>
+</tr>
+<tr>
+    <th/>
+    <td>
+        <input type="button" value="Sign Up Now" id="signupBtn"/>
+    </td>
+</tr>
+<tr>
+    <th/>
+    <td>
+        <div class="mboxDefault" style="visibility: visible; display: block;">
+            <div>{% trans "By clicking 'Sign Up Now' you are indicating you are over 13 years of age" %}</div>
+        </div>
+    </td>
+</tr>
+</tbody>
+</table>
+</form>
+</div>
+</div>
+</div>
+
+{% endblock %}
+

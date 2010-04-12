@@ -1,0 +1,22 @@
+{% load i18n %}
+<!--<div id=nav_back></div>-->
+<div id="nav_back">
+<ul id="nav">
+     {% for menu in nav_menus %}
+       <li
+    {% if forloop.first %}class="first"{% endif %}
+    {% if forloop.last %}class="last"{% endif %}
+    {% if request.url|contain_substr:menu.permalink %}class="selected"{% endif %}
+        ><a href="{{menu.permalink}}" target="{{menu.target}}" {% if request.url|contain_substr:menu.permalink %}class="selected"{% endif %}>{{menu.title}}</a></li>
+     {% endfor %}
+</ul>
+</div>
+<!--
+<script type="text/javascript">
+    YAHOO.util.Event.onAvailable(["nav","nav_back"], function(){
+        var Dom = YAHOO.util.Dom;
+        Dom.setY("nav_back",Dom.getY("nav"));
+        Dom.setStyle("nav_back","position","absolute");
+    });
+</script>
+-->

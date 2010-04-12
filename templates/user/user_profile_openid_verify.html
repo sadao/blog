@@ -1,0 +1,15 @@
+<html>
+<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.7.0/build/reset-fonts-grids/reset-fonts-grids.css" />
+<body class="yui-skin-sam" style="background-color:#fff">
+<div id="status" style="display:none;">{{status}}</div>
+{% if msg %}
+   <script>
+    alert("{{msg}}");
+    opener.location.reload(); 
+    window.close();
+   </script>
+{% else %}
+<div>Processing... Please wait.</div>
+{% endif %}
+</body>
+</html>

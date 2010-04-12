@@ -1,0 +1,80 @@
+# !/usr/bin/env python
+#
+# Copyright 2008 CPedia.com.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+__author__ = 'Ping Chen'
+
+
+import re
+from google.appengine.ext import webapp
+
+import urllib
+import re
+import cgi
+import datetime
+import string
+
+import util
+
+
+
+register = webapp.template.create_template_register()
+
+
+@register.filter
+def contain_substr ( str, substr ):
+       index_  = string.find(str, substr)
+       if index_ ==-1:
+           return False;
+       else:
+           return True;
+
+@register.filter
+def replace ( string, args ):
+        search  = args[0]
+        replace = args[1]
+        return re.sub( search, replace, string )
+
+@register.filter
+def url_fix ( str ):
+    index_  = string.find(string.lower(str), "http://")
+    if index_ ==-1:
+        return "http://"+str;
+    else:
+        return str;
+
+@register.filter
+def email_username ( email ):
+        return email.split("@")[0]
+
+@register.filter
+def unquote ( str ):
+        return urllib.unquote(str.encode('utf8'))
+
+@register.filter
+def quote ( str ):
+        return urllib.quote(str)
+
+@register.filter
+def escape ( str ):
+        return cgi.escape(str)
+
+@register.filter
+def timezone ( date, time_zone_offset ):
+        if time_zone_offset is None:
+           time_zone_offset = 0 
+        offset = datetime.timedelta(hours=time_zone_offset)
+        return date+offset
+

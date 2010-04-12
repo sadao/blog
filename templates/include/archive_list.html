@@ -1,0 +1,22 @@
+{% load i18n %}
+<script type="text/javascript">
+    function showArchivedBlogs(obj) {
+        var archive_value = obj[obj.selectedIndex].value;
+        window.location.href = "/archive/" + archive_value;
+    }
+</script>
+<div id="archives">
+    <h2>{% trans "Archives" %}</h2>
+    <ul>
+        <li>
+        {% if archiveList %}
+        <select onchange="showArchivedBlogs(this)">
+        {% for archive in archiveList %}
+        <option value='{{archive.monthyear|replace:" -"}}' {% if monthyear %}{% ifequal  monthyear archive.monthyear %}selected{% endifequal %}{%endif%}>{{ archive.monthyear }} ({{archive.weblogcount}})
+        </option>
+        {% endfor %}
+        </select>
+        {% endif %}
+        </li>
+    </ul>
+</div>

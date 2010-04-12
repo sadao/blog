@@ -1,0 +1,190 @@
+{% load i18n %}
+{% extends "main.html" %}
+{% block title %}{{title}} - {{blog.title}}{% endblock %}
+{% block blogcontainer %}
+<!-- Skin CSS file -->
+<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.7.0/build/assets/skins/sam/skin.css">
+<!-- Utility Dependencies -->
+<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/element/element-min.js"></script>
+<!-- Needed for Menus, Buttons and Overlays used in the Toolbar -->
+<script src="http://yui.yahooapis.com/2.7.0/build/container/container_core-min.js"></script>
+<!-- Source file for Rich Text Editor-->
+<script src="http://yui.yahooapis.com/2.7.0/build/editor/simpleeditor-min.js"></script>
+<script type="text/javascript" src="/jscripts/images-auto-resize.js"></script>
+<div class="yui-g">
+<div id="blogview">
+<div>
+<H2 class=date-header> {{blog.date|timezone:BLOG.time_zone_offset|date:"l, F d, Y"}} </H2>
+<div class="post">
+    <H3 class=post-title>
+        <a href="/{{blog.relative_permalink}}">{{blog.title}}</a>
+    </H3>
+    <DIV class=post-body>
+        {{blog.content}}
+    </DIV>
+    <DIV class=post-footer>
+        {% if blog.tags %}
+        <p>
+            Tags:
+            {% for tag in blog.tags %}
+            <a href="/tag/{{ tag|unquote }}">{{ tag|unquote }}</a>{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        </p><br>
+        {% endif %}
+        <P>
+            <SPAN class=post-author>{% blocktrans with blog.author as b_author%}Posted by {{ b_author }} at{% endblocktrans %}</SPAN>
+                    <SPAN class=post-timestamp>
+                        <A class=timestamp-link href="/{{blog.relative_permalink}}">{{blog.date|timezone:BLOG.time_zone_offset|date:"H:i A"}}</A>
+                    </SPAN>
+        </P>
+        <P>
+            {% if user_is_admin %}
+        <p style='text-align: right;'>:<a href='/edit/blog/{{blog.key.id}}'>{% trans "edit" %}</a>: :
+            <a href='/delete/blog/{{blog.key.id}}'>{% trans "delete" %}</a>:</p>
+            {% endif  %}
+        {% ifnotequal blog.lastModifiedDate Null %}
+        {% blocktrans with blog.lastModifiedDate|timezone:BLOG.time_zone_offset|date:"Y-m-d H:i" as blog_lastModData and blog.lastModifiedBy as blog_lastModBy %}Edited at {{blog_lastModData}} by {{blog_lastModBy}}.{% endblocktrans %}
+        {% endifnotequal %}
+    </DIV>
+</div>
+{% ifnotequal reactions.count 0 %}
+<br> <br>
+<div class="commentlabel">
+    <h4> {% trans "Reactions" %}</h4>
+</div>
+{% for reaction in reactions %}
+{% if reaction.author%}
+{% ifequal reaction.author reaction.weblog.author%}
+<div class='author comment'>
+{% else %}
+<div class='{% cycle comment,comment1 %}'>
+{% endifequal %}
+{% else %}
+<div class='{% cycle comment,comment1 %}'>
+{% endif %}
+            <p> {% if reaction.authorWebsite %}
+                <a href="{{reaction.authorWebsite|url_fix}}">
+                {% endif%}
+                <b>{%if not reaction.author %}{{reaction.user}}{%else%}{{reaction.author.email|email_username}}{% endif %}</b> |
+                {% if reaction.authorWebsite %}
+                </a>
+                {% endif%}
+                {{reaction.date|timezone:BLOG.time_zone_offset|date:"Y-m-d H:i"}} |
+                {% ifnotequal reaction.userIp Null %}
+                IP:{{reaction.userIp}}
+                {% endifnotequal %}
+            </p>
+            <DIV class=post-body>
+                <img height="32" width="32" class="avatar" src="{%if not reaction.author %}{{reaction.authorEmail|gravatar}}{%else%}{{reaction.author.email|gravatar}}{% endif %}"/>
+                <p>{{reaction.content}}</p>
+            </DIV>
+            <DIV class=post-footer>
+                    <span class='comment-timestamp'>
+                        <p style='text-align: right;'>&nbsp;
+                        {% if user_is_admin %}
+                         :<a href='/edit/comment/{{reaction.key.id}}'>{% trans "edit" %}</a>: :
+                            <a href='/delete/comment/{{reaction.key.id}}'>{% trans "delete" %}</a>:
+                        {% endif %}
+                        </p>
+                        
+                        {% ifnotequal reaction.lastModifiedDate Null %}
+                        {% blocktrans with reaction.lastModifiedDate|timezone:BLOG.time_zone_offset|date:"Y-m-d H:i" as react_lastModData and reaction.lastModifiedBy as react_lastModBy %}Edited at {{react_lastModData}} by {{react_lastModBy}}.{% endblocktrans %}
+                        {% endifnotequal %}
+                    </span>
+            </DIV>
+        </div>
+        <br>
+        {% endfor %}
+        {% endifnotequal %}
+        <div class="commentlabel">
+            <h4> {% trans "Add a reaction" %} </h4>
+        </div>
+        <form method=post action='/addBlogReaction?blogId={{blog.key.id}}' onsubmit="return parseBlogContent()" id="reactionForm">
+            <h2 class="comments-post">{% trans "About You" %}</h2>
+            <div class="input">
+                <input id="name_input" name='name_input' type=text size="45"
+                       value="{% if user %}{{user.nickname}}{%else%}{{blogReaction.user}}{%endif%}" {% if user %}readonly{%endif%}>
+                <label for="name_input"><b>{% trans "Name" %}</b> ({% trans "required" %})</label>
+            </div>
+            <div class="input">
+                <input id="mail" name="mail" type=text size="45" value="{% if user %}{{user.email}}{%else%}{%if blogReaction%}{{blogReaction.authorEmail}}{%endif%}{%endif%}"
+                {% if user %}readonly{%endif%}>
+                <label for="mail"><b>{% trans "Mail" %}</b>  (will not be published) ({% trans "required" %})</label>
+            </div>
+            <div class="input">
+                <input id="website" name="website" type=text size="45" value="{%if blogReaction%}{{blogReaction.authorWebsite}}{%endif%}">
+                <label for="website"><b>{% trans "Website" %}</b></label>
+            </div>
+            <div id="recaptcha" class="input">
+                {%if captchahtml%}
+                <script>
+                var RecaptchaOptions = {
+                   theme : 'white'
+                };
+                </script>
+                {{captchahtml}}
+                {%endif%}
+            </div>
+            <h2 class="comments-post">{% trans "Comment" %}</h2>
+            <div id="blogpost">
+                <textarea id="text_input" name="text_input" rows="12" cols="60">
+                    {%if blogReaction%}{{blogReaction.content}}{%endif%}
+                </textarea>
+            </div>
+            <br>
+            <input name=submit_addreply type=submit value=submit> <br> <br>
+        </form>
+        <script>
+            function init() {
+                if(document.getElementById("recaptcha_response_field")){
+                   {%if captchahtml%}
+                   {%if blogReaction%}
+                      document.getElementById("recaptcha_response_field").focus();
+                   {%endif%}
+                   {%endif%}
+                }
+             }
+             YAHOO.util.Event.onDOMReady(init);
+
+            (function() {
+                var Dom = YAHOO.util.Dom,
+                        Event = YAHOO.util.Event;
+                var myConfig = {
+                    height: '150px',
+                    width: '520px',
+                    dompath: true
+                };
+                var myEditor = new YAHOO.widget.SimpleEditor('text_input', myConfig);
+                myEditor.render();
+            })();
+
+            function parseBlogContent(){
+                //form validator:
+                     var name_input = document.forms["reactionForm"]["name_input"];
+                     if(name_input.value==""){
+                         alert("Please input your name.");
+                         name_input.focus();
+                         return false;
+                     }
+                     var mail = document.forms["reactionForm"]["mail"];
+                     if(mail.value==""){
+                         alert("Please input your email address.");
+                         mail.focus();
+                         return false;
+                     }
+                     if(document.getElementById("recaptcha_response_field")){
+                         if(document.getElementById("recaptcha_response_field").value==""){
+                             alert("Please input the reCAPTCHA code value.");
+                             document.getElementById("recaptcha_response_field").focus();
+                             return false;
+                         }
+                     }
+                var editor = YAHOO.widget.EditorInfo.getEditorById("text_input");
+                editor.saveHTML();        
+                return true;
+            }
+        </script>
+    </div>
+</div>
+</div>
+{% endblock %}

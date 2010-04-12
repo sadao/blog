@@ -1,0 +1,49 @@
+{% load i18n %}
+{% extends "main.html" %}
+{% block title %}{{title}} - Albums - {% if album %}{{album.title.text}}{% endif %}{% endblock %}
+    {% block header %}<script type="text/javascript" src="http://lite.piclens.com/current/piclens.js"></script>
+    {% if album %}<link rel="alternate" href="{{BLOG.root_url}}/atom/albums/{{username}}/{{album.name.text}}" id="{{username}}.{{album.name.text}}" type="application/rss+xml" title="{{ BLOG.title }}"/>{% endif %}{% endblock %}
+{% block blogcontainer %}
+<script type="text/javascript" src="/jscripts/lightbox2.04/js/prototype.js"></script>
+<script type="text/javascript" src="/jscripts/lightbox2.04/js/scriptaculous.js?load=effects,builder"></script>
+<script type="text/javascript" src="/jscripts/lightbox2.04/js/lightbox.js"></script>
+<link rel="stylesheet" href="/jscripts/lightbox2.04/css/lightbox.css" type="text/css" media="screen" />
+<div class="yui-g" id="albumsdiv">
+        {% if album %}
+        <div id="albuminfo">
+            <H3>{% trans "Albums" %}</H3>
+            <p>
+            <a href="/albums">{% trans "Albums" %}</a> -> <a href="/albums/{{username}}">{{username}}</a> -> <a href="/albums/{{username}}/{{album.name.text}}">{{album.title.text}}</a>
+            <p>
+            {% blocktrans with album.datetime|date:"m/d/y" as album_datatime %}Shot at: {{ album_datatime }}{% endblocktrans %} <br>
+            {% blocktrans with album.numphotos as album_numphotos %}Photos Num: {{ album_numphotos }}{% endblocktrans %}
+            <br>
+            <br>
+            <a href="javascript:PicLensLite.start();">Start slideshow (Powered by cooliris)</a>
+            <img src="/img/cooliris_icon_on.gif" alt="PicLens" border="0" align="absmiddle">
+        </div>
+        {% endif %}
+        <p>
+    <div id="albums">
+    <table cellspacing="0" border="0" id="albumsTable">
+    {% for photo in photos %}
+        {% if forloop.counter0|divisibleby:"4"  or forloop.first %}
+        <tr>
+        {% endif %}
+        <td>
+             {% for thumbnail in photo.media.thumbnail%}
+                 {% ifequal forloop.counter 2 %}
+                 <a href="{{photo.content.src}}?imgmax=800" rel="lightbox[roadtrip]" onFocus='this.blur()'>
+                    <img src="{{thumbnail.url}}" onmouseover="{this.style.border='1px solid #000066'}" onmouseout="{this.style.border='1px solid #CCCCCC'}"/>
+                 </a>
+                 {% endifequal %}
+             {% endfor %}
+        </td>
+        {% if forloop.counter|divisibleby:"4" or forloop.last%}
+          </tr>
+        {% endif %}
+    {% endfor %}
+    </table>
+    </div>
+</div>
+{% endblock %}

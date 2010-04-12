@@ -1,0 +1,49 @@
+{% load i18n %}        
+<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.7.0/build/datatable/assets/skins/sam/datatable.css" />
+<script type="text/javascript" src="/jscripts/menulist.grid.js"></script>
+<fieldset id="admin_menus">
+    <legend>{% trans "Menu Admin" %}</legend>
+    <div class="fieldsetdiv">
+        Menu List:<br>
+        <input type="button" value="Add new Menu" id="add_menu_btn"/>
+        <input type="button" value="Delete Menu(s)" id="delete_menu_btn"/>
+        <input type="button" value="Add Albums link to Menu" id="add_menu_album_btn"/> <br/>
+            <div id="menudiv" style="padding-top:5px">
+            </div>
+        <br/>        
+        Google profile user id:<input id="profile_id" value="">&nbsp;<input type="button" value="Add Google Profile link to Menu" id="add_menu_profile_btn"/> <br/>
+        Google books user id:<input id="book_id" value="">&nbsp;<input type="button" value="Add My Google library link to Menu" id="add_menu_book_btn"/> <br/>
+    	</div>
+</fieldset>
+
+<fieldset>
+    <legend>{% trans "Pages Admin" %}</legend>
+    <div class="fieldsetdiv">
+        {% trans "Page List" %}:
+        <table id="pagetable" class="yui-skin-sam noborder_table">
+            <tr>
+                <th>{% trans "Title" %}</th>
+                <th>{% trans "Author" %}</th>
+                <th>{% trans "Date" %}</th>
+                <th>{% trans "Permalink" %}</th>
+                <th> &nbsp;</th>
+            </tr>
+            {% for entry in pages %}
+            <tr>
+                <td>{{entry.title}}</td>
+                <td>{{entry.author.email}}</td>
+                <td>{{entry.date|timezone:BLOG.time_zone_offset|date:"m/d/y"}}</td>
+                <td>
+                    <a href="{{entry.full_permalink}}" target="_blank">{{entry.full_permalink}}</a>
+                </td>
+                <td>
+                    <a href='/edit/blog/{{entry.key.id}}' target="_blank">{% trans "edit" %}</a> &nbsp;
+                    <a href='/delete/blog/{{entry.key.id}}' target="_blank">{% trans "delete" %}</a>
+                </td>
+            </tr>
+            {% endfor%}
+        </table>
+    </div>
+</fieldset>
+        
+

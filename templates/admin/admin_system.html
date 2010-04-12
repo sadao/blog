@@ -1,0 +1,322 @@
+{% load i18n %}
+<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.7.0/build/datatable/assets/skins/sam/datatable.css" />
+<script type="text/javascript">
+    YAHOO.util.Event.onAvailable("time_zone_offset",function() {
+        var time_zone_offset = document.getElementById("time_zone_offset");
+        for (var i = 0; i < time_zone.length; i++) {
+            var option = new Option(time_zone[i].display, time_zone[i].value);
+            time_zone_offset.options[time_zone_offset.options.length] = option;
+            if (parseFloat(time_zone[i].value) == parseFloat("{{BLOG.time_zone_offset}}")) {
+                time_zone_offset.options[time_zone_offset.options.length-1].selected = true;
+            }
+        }
+    });
+    (function(){
+        var Dom = YAHOO.util.Dom;
+        var logo_select = function(){
+            if(Dom.get("logo_select_url").checked){
+               Dom.get("custom_logo_url").disabled = false;
+               Dom.get("custom_logo").disabled = true;
+            }else{
+                Dom.get("custom_logo_url").disabled = true;
+                Dom.get("custom_logo").disabled = false;
+            }
+        };
+        YAHOO.util.Event.addListener(["logo_select_url","logo_select_upload"],"click",logo_select);
+    })();
+    function checkDelicious(){
+        var delicious = document.getElementById("delicious_enable");
+        var delicious_username = document.getElementById("delicious_username");
+        delicious_username.disabled = !delicious.checked;
+    }
+    function checkGoogleAjaxFeed(){
+        var google_ajax_feed_enable = document.getElementById("google_ajax_feed_enable");
+        var google_ajax_feed_title = document.getElementById("google_ajax_feed_title");
+        var google_ajax_feed_result_num = document.getElementById("google_ajax_feed_result_num");
+        google_ajax_feed_title.disabled = !google_ajax_feed_enable.checked;
+        google_ajax_feed_result_num.disabled = !google_ajax_feed_enable.checked;
+    }
+    function checkRecaptcha(){
+        var recaptcha_enable = document.getElementById("recaptcha_enable");
+        var recaptcha_public_key = document.getElementById("recaptcha_public_key");
+        var recaptcha_private_key = document.getElementById("recaptcha_private_key");
+        recaptcha_public_key.disabled = !recaptcha_enable.checked;
+        recaptcha_private_key.disabled = !recaptcha_enable.checked;
+    }
+    function saveConfiguration(){
+        var title = document.forms["configForm"]["title"];
+        if(title.value==""){
+            alert("Please input blog title.");
+            title.focus();
+            return false;
+        }
+        var author = document.forms["configForm"]["author"];
+        if(author.value==""){
+            alert("Please input author name.");
+            author.focus();
+            return false;
+        }
+        var root_url = document.forms["configForm"]["root_url"];
+        if(root_url.value==""){
+            alert("Please input root url address.");
+            root_url.focus();
+            return false;
+        }
+        var num_post_per_page = document.forms["configForm"]["num_post_per_page"];
+        if(num_post_per_page.value=="" || !isInteger(num_post_per_page.value)){
+            alert("Please input posts num per page.");
+            num_post_per_page.focus();
+            return false;
+        }
+        var cache_time = document.forms["configForm"]["cache_time"];
+        if(cache_time.value=="" || !isInteger(cache_time.value)){
+            alert("Please input page cache time value.");
+            cache_time.focus();
+            return false;
+        }
+        var google_ajax_feed_result_num = document.forms["configForm"]["google_ajax_feed_result_num"];
+        var google_ajax_feed_title = document.forms["configForm"]["google_ajax_feed_title"];
+        if (document.forms["configForm"]["google_ajax_feed_enable"].checked) {
+            google_ajax_feed_result_num.disabled = false;
+            google_ajax_feed_title.disabled = false;
+            if(google_ajax_feed_title.value==""){
+                alert("Please input feed control main title.");
+                google_ajax_feed_title.focus();
+                return false;
+            }
+            if (google_ajax_feed_result_num.value == "" || !isInteger(google_ajax_feed_result_num.value)) {
+                alert("Please input result num per feed.");
+                google_ajax_feed_result_num.focus();
+                return false;
+            }
+        }else{
+           google_ajax_feed_result_num.disabled = true;
+           google_ajax_feed_title.disabled = true;
+        }
+        var delicious_enable = document.forms["configForm"]["delicious_enable"];
+        var delicious_username = document.forms["configForm"]["delicious_username"];
+        if (delicious_enable.checked) {
+            delicious_username.disabled = false;
+            if(delicious_username.value==""){
+                alert("Please input del.icio.us username.");
+                google_ajax_feed_title.focus();
+                return false;
+            }
+        }else{
+            delicious_username.disabled = true;
+        }
+        var recaptcha_enable = document.forms["configForm"]["recaptcha_enable"];
+        var recaptcha_public_key = document.forms["configForm"]["recaptcha_public_key"];
+        var recaptcha_private_key = document.forms["configForm"]["recaptcha_private_key"];
+        if (recaptcha_enable.checked) {
+            recaptcha_public_key.disabled = false;
+            recaptcha_private_key.disabled = false;
+            if(recaptcha_public_key.value==""){
+                alert("Please input recaptcha public key.");
+                recaptcha_public_key.focus();
+                return false;
+            }
+            if(recaptcha_private_key.value==""){
+                alert("Please input recaptcha private key.");
+                recaptcha_private_key.focus();
+                return false;
+            }
+        }else{
+            recaptcha_public_key.disabled = true;
+            recaptcha_private_key.disabled = true;
+        }
+        var analytics_enable = document.forms["configForm"]["analytics_enable"];
+        var analytics_web_property_id = document.forms["configForm"]["analytics_web_property_id"];
+        if (analytics_enable.checked) {
+            analytics_web_property_id.disabled = false;
+            if(analytics_web_property_id.value==""){
+                alert("Please input Google Analytics web property ID.");
+                analytics_web_property_id.focus();
+                return false;
+            }
+        }else{
+            analytics_web_property_id.disabled = true;
+        }
+
+        var logo_images = document.forms["configForm"]["logo_images"];
+        var logoUrls = logo_images.value.replace(/[,;\n\r]/g, ' ');
+        logoUrls = logoUrls.replace(/[ ]+/g, ' ').trim();
+        var logoArray = logoUrls.split(' ');
+        var logo_images_space = "";
+        for(var i=0;i<logoArray.length;i++){
+           logo_images_space+=logoArray[i];
+           if(i!=logoArray.length-1){
+            logo_images_space+=" ";
+           }
+        }
+        document.forms["configForm"]["logo_images_space"].value = logo_images_space;
+
+        //replace the AJAX post form submit because of the bug of YUI in firefox 3.0
+        //see: http://developer.yahoo.com/yui/connection/#issues
+        var formObject = document.getElementById('configForm');
+        formObject.action = "/admin/system";
+        formObject.submit();
+    }
+</script>
+<fieldset id="admin_system">
+    <legend>{% trans "System Configuration" %}</legend>
+    <div class="fieldsetdiv">
+    <form method=post id="configForm" name="configForm" enctype= "multipart/form-data">
+    <table cellspacing="0" class="yui-skin-sam noborder_table">
+        <tr>
+            <th><label for="title">{% trans "Blog Title" %}:</label></th>
+            <td>
+              <input id="title"  name="title" size="30" type="text" value="{{BLOG.title}}" />
+            </td>
+        </tr>
+        <tr>
+            <th><label for="author">{% trans "Author" %}:</label></th>
+            <td>
+                <input id="author"  name="author" size="15" type="text" value="{{BLOG.author}}" />
+                  </td>
+        </tr>
+        <tr>
+            <th><label>{% trans "Email" %}:</label></th>
+            <td> <i><b>{{user.email}}</b></i> <img src="{{user_gravatar_url}}" style="width:16px;height:16px">
+                <p><small>If you see a <img src="/img/anonymous-16.jpg" style="width:8px;height:8px"> above it means you either don't have a Gravatar for that email
+                   address or it is not rated G. <a target="_blank" href="http://site.gravatar.com/">{% trans "Get one for free at gravatar.com" %}</a>.</small></p>
+            </td>
+        </tr>
+        <tr>
+            <th><label for="description">{% trans "Blog Description" %}:</label></th>
+            <td><input id="description" name="description" size="60" type="text" value="{{BLOG.description}}" /> </td>
+        </tr>
+        <tr>
+            <th><label for="root_url">{% trans "Root URL" %}:</label></th>
+            <td>
+                <input id="root_url" name="root_url" size="30" type="text" value="{{BLOG.root_url}}" />
+            </td>
+        </tr>
+        <tr>
+            <th><label for="time_zone_offset">{% trans "Time Zone" %}:</label></th>
+            <td>
+                <select id="time_zone_offset" name="time_zone_offset">
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <th><label for="logo_images">{% trans "Logo image" %}:</label></th>
+            <td>
+                <br/>
+                <p><input type="checkbox" id="show_description" name="show_description" {% if BLOG.description_next_logo %}checked{% endif %}/> Show blog description next to logo. </p>
+                <br/>
+                <p><input type="radio" checked="checked" name="logo_select" id="logo_select_url"/>
+                <b>Set the logo image url:</b></p>
+                <input id="custom_logo_url" name="custom_logo_url" size="60" type="text" value="{{BLOG.site_logo}}" />
+                 <br/>
+                 <br/>
+                <p><input type="radio" name="logo_select" id="logo_select_upload"/>
+                <b>Upload a new image to use as your logo:</b></p>
+                <input name="custom_logo" id="custom_logo" size="60" type="file" disabled="disabled">
+                <p><small>{% trans "The image file should be in PNG, JPG or GIF format and a maximum of 200 x 60 pixels. Larger images will be scaled automatically." %}</small></p>
+            </td>
+        </tr>
+        <tr>
+            <th><label for="logo_images">{% trans "Banner images" %}:</label></th>
+            <td>
+                <input type="hidden" id="logo_images_space" name="logo_images_space"/>
+                <textarea id="logo_images" name="logo_images"  rows="4" cols="50" style="">{% for logo in logoImages %}{{logo}}{% if not forloop.last %} {% endif %}{% endfor %}</textarea>
+                <p><small>{% trans "Separate banner image urls with commas and/or newlines. These images will randomly display on the site." %}</small></p>
+            </td>
+        </tr>
+        <tr>
+            <th><label for="num_post_per_page">{% trans "Posts num per page" %}:</label></th>
+            <td>
+                <input id="num_post_per_page" name="num_post_per_page" maxlength="15" size="15" type="text" value="{{BLOG.num_post_per_page}}" />
+                <p><small>{% trans "This number is used for the pagination." %}</small></p>
+            </td>
+        </tr>
+        <tr>
+            <th><label for="cache_time">{% trans "Page Cache Time" %}:</label></th>
+            <td>
+                <input id="cache_time" name="cache_time" maxlength="15" size="15" type="text" value="{{BLOG.cache_time}}" />
+                <p><small>{% trans "Be careful! This value will make your page unchanging for the specified time." %}</small></p>
+            </td>
+        </tr>
+        <tr>
+            <th><label for="debug">{% trans "Debug Mode" %}:</label></th>
+            <td>
+                <input id="debug" name="debug" type="checkbox" {% if BLOG.debug %} checked {% endif %}/>
+                <p><small>{% trans "You can get more detailed log info in appengine when enable debug mode." %}</small></p>
+            </td>
+        </tr>
+        <tr>
+            <th><label for="recaptcha_enable">{% trans "Recaptcha enable" %}:</label></th>
+            <td>
+                <input id="recaptcha_enable" name="recaptcha_enable"  onclick="checkRecaptcha()" type="checkbox" {% if BLOG.recaptcha_enable %} checked {% endif %}/>
+                <p><small>{% trans "reCAPTCHA is a free CAPTCHA service that helps to enable anti-spam for the post's comment." %}  </small></p>
+                <p><small>{% trans "You can get reCAPTCHA for free from" %}: <a href="http://recaptcha.net/">http://recaptcha.net/</a>. </small></p>
+            </td>
+        </tr>
+        <tr>
+            <th><label for="recaptcha_public_key">Recaptcha {% trans "public key" %}:</label></th>
+            <td>
+                <input id="recaptcha_public_key" name="recaptcha_public_key"  size="60" type="text" value="{{BLOG.recaptcha_public_key}}"/>
+            </td>
+        </tr>
+        <tr>
+            <th><label for="recaptcha_private_key">Recaptcha {% trans "private key" %}:</label></th>
+            <td>
+                <input id="recaptcha_private_key" name="recaptcha_private_key"  size="60" type="text" value="{{BLOG.recaptcha_private_key}}"/>
+            </td>
+        </tr>
+        <tr>
+            <th><label for="delicious_enable">del.icio.us {% trans "enable" %}:</label></th>
+            <td>
+                <input id="delicious_enable" name="delicious_enable" onclick="checkDelicious()" type="checkbox" {% if BLOG.delicious_enable %} checked {% endif %}/>
+                <small>{% trans "Delicious is a Social Bookmarking service." %} </small>
+            </td>
+        </tr>
+        <tr>
+            <th><label for="delicious_username">del.icio.us {% trans "username" %}:</label></th>
+            <td>
+                <input id="delicious_username" name="delicious_username"  size="15" type="text" value="{{BLOG.delicious_username}}"/>
+                <small>{% trans "You can get del.icio.us for free from" %}: <a href="http://delicious.com/">http://delicious.com/</a> </small>
+            </td>
+        </tr>
+        <tr>
+            <th><label for="google_ajax_feed_enable">{% trans "Feed control enable" %}:</label></th>
+            <td>
+                <input id="google_ajax_feed_enable" name="google_ajax_feed_enable" onclick="checkGoogleAjaxFeed()"  type="checkbox"  {% if BLOG.google_ajax_feed_enable %} checked {% endif %}/>
+                <small>{% trans "Enable feed control on your site." %}</small>
+                <p><small>{% trans "You can manage your feeds on the Feeds tab." %}</small></p>
+            </td>
+        </tr>
+        <tr>
+            <th><label for="google_ajax_feed_title">{% trans "Feed control main title" %}:</label></th>
+            <td>
+                <input id="google_ajax_feed_title" name="google_ajax_feed_title"  size="30" type="text" value="{{BLOG.google_ajax_feed_title}}"/>
+            </td>
+        </tr>
+        <tr>
+            <th><label for="google_ajax_feed_result_num">{% trans "Result num per feed" %}:</label></th>
+            <td>
+                <input id="google_ajax_feed_result_num" name="google_ajax_feed_result_num" maxlength="15" size="15" type="text" value="{{BLOG.google_ajax_feed_result_num}}"/>
+            </td>
+        </tr>
+        <tr>
+            <th><label for="analytics_enable">{% trans "Google Analytics enable" %}:</label></th>
+            <td>
+                <input id="analytics_enable" name="analytics_enable" type="checkbox" {% if BLOG.analytics_enable %} checked {% endif %}/>
+                <small>You may track visits to your site in <a href="http://www.google.com/analytics/">Google Analytics</a>.</small>
+            </td>
+        </tr>
+        <tr>
+            <th><label for="analytics_web_property_id">{% trans "Google Analytics Web Property ID" %}:</label></th>
+            <td>
+                <input id="analytics_web_property_id" name="analytics_web_property_id"  size="15" type="text" value="{{BLOG.analytics_web_property_id}}"/> <small>Example: UA-1234567-1</small>
+            </td>
+        </tr>
+        <tr>
+            <th> </th>
+            <td><input name="commit" type="button" value="Save" id="save_btn" onclick="saveConfiguration()"/></td>
+        </tr>
+    </table>
+    </form>
+    </div>
+</fieldset>

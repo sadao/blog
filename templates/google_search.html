@@ -1,0 +1,32 @@
+{% load i18n %}
+{% extends "main.html" %}
+{% block title %}{{title}} - Google Search Result{% endblock %}
+{% block blogcontainer %}
+<div class="yui-g">
+
+    {% if error %}
+    <div class="error">
+        {{error}}
+    </div>
+    {% endif %}
+
+    <div id="google_search_result">
+        <!-- Google Search Result Snippet Begins -->
+        <div id="googleSearchUnitIframe"></div>
+
+        <script type="text/javascript">
+            //get the main div width.
+            var div_offset = document.getElementById("google_search_result").offsetWidth;
+                    
+            var googleSearchIframeName = 'googleSearchUnitIframe';
+            var googleSearchFrameWidth = div_offset;
+            var googleSearchFrameborder = 0 ;
+            var googleSearchDomain = 'www.google.com';
+        </script>
+        <script type="text/javascript"
+                src="http://www.google.com/afsonline/show_afs_search.js">
+        </script>
+        <!-- Google Search Result Snippet Ends -->
+    </div>
+</div>
+{% endblock %}

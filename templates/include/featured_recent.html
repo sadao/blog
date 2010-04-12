@@ -1,0 +1,16 @@
+{% load i18n %}
+{% if recentFeatured %}
+<div id="featured">
+    <h2>{% trans "Recent Featured" %}</h2>
+    <ul>
+        {% for blog in recentFeatured %}
+        <li>
+            <a href="/{{blog.relative_permalink}}"> {{blog.title}}</A>
+        </li>
+        {% endfor %}
+        <li>
+            <div align="right"><a href="/tag/featured"><small>More</small></a></div>
+        </li>
+    </ul>
+</div>
+{% endif %}

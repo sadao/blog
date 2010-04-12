@@ -1,0 +1,12 @@
+<div id="google_ad">
+</div>
+<!--
+fetch the google ad content from google_ad_content.html.
+As the google_ad_content.html at the foot the page, that will improve the performance.
+-->
+<script type="text/javascript">
+   YAHOO.util.Event.onContentReady("google_ad_content",function(){
+       var Dom = YAHOO.util.Dom;
+       Dom.get("google_ad").innerHTML = Dom.get("google_ad_content").innerHTML;
+   });
+</script>

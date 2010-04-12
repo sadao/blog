@@ -1,0 +1,152 @@
+{% load i18n %}
+{% extends "main.html" %}
+{% block title %}{{title}} - My Google Books Library{% endblock %}
+{% block header %}
+<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.7.0/build/paginator/assets/skins/sam/paginator.css" />
+<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/element/element-min.js"></script>
+<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/paginator/paginator-min.js"></script>
+{% endblock %}
+{% block blogcontainer %}
+<script type="text/javascript">
+    YAHOO.util.Event.onDOMReady(function() {
+        var books_content = YAHOO.util.Dom.get("books_content");
+        var book_link = books_content.getElementsByTagName("a");
+        for(var i=0;i<book_link.length;i++){
+           book_link[i].target = "_blank";
+        }
+        var Ex = YAHOO.namespace('googlebooks');
+        Ex.content = YAHOO.util.Dom.getElementsByClassName("rsi","table");
+        Ex.handlePagination = function (state) {
+            // Gather the content for the requested page
+            var startIndex = state.recordOffset,
+                recs = Ex.content.slice(startIndex, startIndex + state.rowsPerPage);
+            // Update the content UI
+            Ex.content.start = startIndex + 1;
+            YAHOO.util.Dom.get("book_list").innerHTML = "";
+            for(var i=0;i<recs.length;i++){
+               YAHOO.util.Dom.get("book_list").appendChild(recs[i].cloneNode(true)); 
+            }
+            // Confirm state change with the Paginator
+            Ex.paginator.setState(state);
+        };
+
+        Ex.paginator = new YAHOO.widget.Paginator({
+            rowsPerPage : 10,
+            totalRecords : Ex.content.length,
+            containers : ['span_container','p_container'],
+            template : "{PreviousPageLink} {CurrentPageReport} {NextPageLink}",
+            previousPageLinkLabel : "&lt;",
+            nextPageLinkLabel : "&gt;",
+            pageReportTemplate : "{startRecord} - {endRecord} of {totalRecords}"
+        });
+        Ex.paginator.subscribe('changeRequest', Ex.handlePagination);
+        Ex.paginator.render();
+        Ex.handlePagination(Ex.paginator.getState());
+    });
+</script>
+<style type="text/css">
+    .title{
+        font-size:18px;margin-bottom:5px;margin-left:10px;margin-top:10px;
+    }
+    .rsi {
+        margin-bottom: 5px;
+        margin-left: -10px;
+        margin-top: 15px;
+    }
+
+    .casmall {
+        left: -5px;
+        position: relative;
+        top: -5px;
+    }
+    .coverthumb {
+        background-color: #FFFFFF;
+        border: 1px solid #0000CC;
+    }
+    .coverdstd {
+        padding: 8px 8px 0 18px;
+        text-align: center;
+        vertical-align: top;
+        width: 85px;
+    }
+
+    h2.resbdy {
+        font-size: 1.2em;
+        font-weight: normal;
+        line-height: normal;
+        margin: -0.1em 0 0;
+        padding: 0;
+    }
+    .lim {
+        color: #99522E;
+    }
+
+    .dsb {
+        -moz-background-clip: border;
+        -moz-background-inline-policy: continuous;
+        -moz-background-origin: padding;
+        background: #FFFFFF url(/img/cover_shadow_bg.gif) no-repeat scroll right bottom;
+        display: table-cell;
+        float: left;
+        margin: 0;
+        padding: 0;
+        position: relative;
+    }
+</style>
+<div class="yui-g">
+
+    {% if error %}
+    <div class="error">
+        {{error}}
+    </div>
+    {% endif %}
+
+    <div id="books_content">
+        <span class="title">Books in my Google library</span>
+        <p id="span_container"></p>
+        <div id="book_list">
+        </div>
+        <div id="books_data" style="display:none">
+        {% for book in books%}
+        {% if book.dc_title %}
+        <table cellspacing="0" cellpadding="0" border="0" class="rsi">
+            <tbody>
+            <tr>
+                <td align="center" class="coverdstd">
+                    <div class="dsbwrap">
+                        <div class="dsb">
+                            <div class="cornert"/>
+                            <div class="cornerb"/>
+                            <div class="casmall"><a
+                                    href="{%if book.GetPreviewLink%}{{book.GetPreviewLink.href}}{% else %}{% if book.GetInfoLink %}{{book.GetInfoLink.href}}{% endif %}{%endif%}">
+                                <img
+                                    width="60" height="80" border="0"
+                                    src="{%if book.GetThumbnailLink%}{{book.GetThumbnailLink.href}}{%endif%}"
+                                    dir="ltr" title="{% if book.dc_title %}{% for title in book.dc_title %}{{title.text}} {% endfor %} {% endif %}" class="coverthumb"
+                                    alt="{% if book.dc_title %}{% for title in book.dc_title %}{{title.text}} {% endfor %} {% endif %}"/></a></div>
+                        </div>
+                    </div>
+                </td>
+                <td valign="top">
+                    <div class="resbdy"><h2 class="resbdy"><a
+                            href="{%if book.GetPreviewLink%}{{book.GetPreviewLink.href}}{% else %}{% if book.GetInfoLink %}{{book.GetInfoLink.href}}{% endif %}{%endif%}"><span
+                            dir="ltr">{% if book.dc_title %}{% for title in book.dc_title %}{{title.text}} {% endfor %} {% endif %}</span>‎</a></h2><font size="-1"><span
+                            style="line-height: 1.2em;"><span class="ln2">by
+                        {% for author in book.creator %}{{author.text}} {% if not forloop.last %},{% endif %}{% endfor %}
+                        - {% for subject in book.subject %}<a class="link_aux" href="http://books.google.com/books?q=+subject:{{subject.text}}">{{subject.text}}</a> {% if not forloop.last %},{% endif %}{% endfor %}
+                         - {{book.date.text|slice:":4"}} - <span class="lim">{%if book.GetPreviewLink%}Limited preview{%endif%}</span></span><br/><div
+                            dir="ltr" class="snippet sa">{{book.description.text}}
+                    </div>
+</span></font></div>
+                </td>
+                <td align="right"/>
+            </tr>
+            </tbody>
+        </table>
+        {% endif %}
+        {% endfor %}
+         </div>
+        <p id="p_container"></p>
+    </div>
+</div>
+{% endblock %}

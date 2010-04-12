@@ -1,0 +1,21 @@
+{% load i18n %}
+<div id="typepad_connect">
+
+<div class="comments-content">
+    <div id="tpc_thread"></div>
+    <div style="display:none;" id="tpc_post_title"></div>
+    <div style="display:none;" id="tpc_post_message"></div>
+    <script type="text/javascript">
+        var TPConnect = {};
+
+        TPConnect.tpc_url = '';
+        TPConnect.tpc_title = document.getElementById('tpc_post_title').innerHTML;
+        TPConnect.tpc_message = document.getElementById('tpc_post_message').innerHTML;
+    </script>
+    <script type="text/javascript" src="http://profile.typepad.com/services/embed/tpc/6a011570e3cd20970c01347fcfda99970c/embed.js"></script>
+    <script type="text/javascript" src="http://static.typepad.com/.shared/js/profile/blogside.js"></script>
+    <noscript><a href="http://profile.typepad.com/services/embed/tpc/6a011570e3cd20970c01347fcfda99970c/thread">View the entire comment thread.</a></noscript>
+</div>
+<!-- END TypePad Connect -->
+
+</div>

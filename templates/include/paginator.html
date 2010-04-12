@@ -1,0 +1,27 @@
+<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.7.0/build/paginator/assets/skins/sam/paginator.css">
+<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/element/element-min.js"></script>
+<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/paginator/paginator-min.js"></script>
+<script type="text/javascript">
+    YAHOO.util.Event.onDOMReady(function () {
+    // Set up the application under the YAHOO.cpedialog namespace
+    var Ex = YAHOO.namespace('cpedialog');
+    Ex.handlePagination = function (state) {
+        window.location.href = "/page/"+ state.page;
+        // Update the Paginator's state, confirming change
+        Ex.paginator.setState(state);
+    };
+    // Create the Paginator widget and subscribe to its changeRequest event
+    Ex.paginator = new YAHOO.widget.Paginator({
+        initialPage :{{page.page_number}},
+        rowsPerPage : {{BLOG.num_post_per_page}},
+        totalRecords : {{page.count}},
+        alwaysVisible : false,
+        pageLinks : 8,
+        containers : 'paging'
+    });
+    Ex.paginator.subscribe('changeRequest', Ex.handlePagination);
+    // Render the Paginator into the configured container(s)
+    Ex.paginator.render();
+    });
+</script>
+<div id="paging"></div>

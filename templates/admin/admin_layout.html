@@ -1,0 +1,161 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <title>{{BLOG.title}} - Layout Management</title>
+    <link rel="stylesheet" type="text/css"
+          href="http://yui.yahooapis.com/2.7.0/build/reset-fonts-grids/reset-fonts-grids.css"/>
+    <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.7.0/build/assets/skins/sam/skin.css">
+    <link rel="stylesheet" type="text/css" href="/stylesheets/portal.css">
+    {% for sheet in stylesheets %}
+    <link type="text/css" rel="stylesheet" href="{{ sheet.filename }}"/>
+    {% endfor %}
+    <script type="text/javascript" src="http://yui.yahooapis.com/3.0.0b1/build/yui/yui-min.js"></script>    
+    <style type="text/css">
+        #showSlider { position: relative; }
+        #sliderbg { background-image: url( /img/bg-fader.gif ); background-repeat: repeat-x; position: relative; top: 10px; height: 40px; width: 209px; }
+        #sliderthumb { position: absolute; }
+        #custom-doc { margin:auto;text-align:left; }
+        #sliderValue { border: 1px solid #ccc; }
+        #toolBoxHolder {
+            visibility: hidden;
+        }
+
+        #toolBoxHolder fieldset {
+            border: 1px solid #ccc;
+            padding: .5em;
+            margin: .5em 0;
+        }
+
+        #toolBoxHolder p {
+            padding-bottom: .25em
+        }
+    </style>
+    <base target="_blank"/>
+</head>    
+<body class="yui-skin-sam">
+<div>
+   You can press <b>Ctrl+Y</b> to show the hidden toolbox.  <a href="/" target="_blank">Preview</a><br>
+    All the change will store in Cookie, when you click "Save Current Layout" button, the setting in Cookie will persistence to DB.
+</div>
+<div id="doc2" class="yui-t5">
+    <div id="hd">
+        <ul class="list" id="list1">
+            {# include "../main_top.html" #}
+        </ul>
+    </div>
+    <div id="bd">
+        <div id="yui-main">
+            <div class="yui-b">
+                <div class="yui-gc" id="div_mainblock">
+                    <div class="yui-u first" id="div_mainblock_sub1">
+                        <ul class="list" id="list2"></ul>
+                    </div>
+                    <div class="yui-u" id="div_mainblock_sub2">
+                        <ul class="list" id="list3"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="yui-b" id="div_sidebar">
+            <ul class="list" id="list4"></ul>
+        </div>
+    </div>
+    <div id="ft">
+        <ul class="list" id="list5"></ul>        
+    </div>
+</div>
+<div style="display:none;">
+    <div id="drag_main_top" class="div_cpedialog" title="Header">
+    
+    </div>    
+    <div id="drag_footer" class="div_cpedialog" title="Footer">
+    {% include "../footer.html" %}
+    </div>    
+    <div id="drag_blog_list_main" class="div_cpedialog" title="Blog List">
+    {% include "../include/blog_list_main.html" %}
+    </div>
+    <div id="drag_archive_list" class="div_cpedialog" title="Archive List">
+    {% include "../include/archive_list.html" %}
+    </div>
+    <div id="drag_comment_recent" class="div_cpedialog" title="Recent Comment">
+    {% include "../include/comment_recent.html" %}
+    </div>
+    <div id="drag_google_ad" class="div_cpedialog" title="Google AD">
+    {% include "../include/google_ad.html" %}
+    </div>
+    <div id="drag_google_ajax_feed" class="div_cpedialog" title="Ajax Feed">
+    {% include "../include/google_ajax_feed.html" %}
+    </div>
+    <div id="drag_paginator" class="div_cpedialog" title="Paginator">
+    {% include "../include/paginator.html" %}
+    </div>
+    <div id="drag_sidebar_login" class="div_cpedialog" title="Login Box">
+    {% include "../include/sidebar_login.html" %}
+    </div>
+    <div id="drag_tagcloud" class="div_cpedialog" title="Tag Cloud">
+    {% include "../include/tagcloud.html" %}
+    </div>
+</div>
+<div id="toolBoxHolder">
+    <div class="hd">Toolbox</div>
+    <div class="bd">
+        <div id="feeds">
+                <p>Drag a div into one of the columns.</p>
+                <ul></ul>
+        </div>
+        <form id="grids">
+            <fieldset>
+                <legend>Body Size:</legend>
+                <select id="which_doc">
+                    <option value="doc">750px</option>
+                    <option value="doc2">950px</option>
+                    <option value="doc4">974px</option>
+                    <option value="doc3">100%</option>
+                    <option value="custom-doc" id="customDoc">Custom</option>
+                </select>
+            </fieldset>
+            <fieldset>
+                <legend>Body Columns:</legend>
+                <select id="which_grid">
+                    <option value="yui-t1">Sidebar left 160px</option>
+                    <option value="yui-t2">Sidebar left 180px</option>
+                    <option value="yui-t3">Sidebar left 300px</option>
+                    <option value="yui-t4">Sidebar right 180px</option>
+                    <option value="yui-t5">Sidebar right 240px</option>
+                    <option value="yui-t6">Sidebar right 300px</option>
+                </select>
+            </fieldset>
+            <fieldset>
+                <legend>Split Content:</legend>
+                <span>
+                    <p>Row:<br>
+                        <select id="splitBody0">
+                            <option value="1">1 Column (100)</option>
+                            <option value="2">2 Column (50/50)</option>
+                            <option value="3">2 Column (66/33)</option>
+                            <option value="4">2 Column (33/66)</option>
+                            <option value="5">2 Column (75/25)</option>
+                            <option value="6">2 Column (25/75)</option>
+                        </select>
+                    </p>
+                </span>
+            </fieldset>
+            <button type="button" id="saveLayout">Save Current Layout</button> <br><br>
+            <button type="button" id="resetBuilder">Reset System Default</button>
+        </form>
+    </div>
+    <div class="ft"></div>
+
+</div>
+<script>
+    var yuiConfig = {combine: true, timeout: 10000};
+</script>
+<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/utilities/utilities.js"></script>
+<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/button/button-min.js"></script>
+<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/container/container-min.js"></script>
+<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/slider/slider-min.js"></script>
+<script type="text/javascript" src="/jscripts/portal.js"></script>
+
+</body>
+</html>

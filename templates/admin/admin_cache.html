@@ -1,0 +1,75 @@
+{% load i18n %}
+<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.7.0/build/datatable/assets/skins/sam/datatable.css" />
+<script type="text/javascript">
+    function flushAllMemcache(flush) {
+        var sUrl = "/rpc?action=FlushAllMemcache&arg0=" + flush + "&time=" + new Date().getTime();
+        var flushAllMemcacheSuccess = function(o) {
+            if (o.responseText !== undefined) {
+                var cache_stats = YAHOO.lang.JSON.parse(o.responseText);
+                document.getElementById("cache_stats.hits").innerHTML = cache_stats.hits;
+                document.getElementById("cache_stats.misses").innerHTML = cache_stats.misses;
+                document.getElementById("cache_stats.byte_hits").innerHTML = cache_stats.byte_hits;
+                document.getElementById("cache_stats.items").innerHTML = cache_stats.items;
+                document.getElementById("cache_stats.bytes").innerHTML = cache_stats.bytes;
+                document.getElementById("cache_stats.oldest_item_age").innerHTML = cache_stats.oldest_item_age;
+                if (o.argument.flush) {
+                    alert("Flush all the memcache successfully.");
+                } else {
+                    alert("Refresh memcache statistics successfully.");
+                }
+            }
+        }
+        var callback =
+        {
+            success:flushAllMemcacheSuccess,
+            failure:handleFailure,
+            argument:{flush:flush}
+        };
+        YAHOO.util.Connect.asyncRequest('GET', sUrl, callback);
+    }
+</script>
+<fieldset id="admin_cache">
+    <legend>{% trans "System Cache Management" %}</legend>
+    <div class="fieldsetdiv">
+        {% trans "Memcache statistics for this application" %}:
+        <table cellspacing="0" class="yui-skin-sam noborder_table">
+            <tr>
+                <th>{% trans "hits" %}</th>
+                <td><span id="cache_stats.hits">{{cache_stats.hits}}</span></td>
+                <td><span class="fieldsetcomment">{% trans "Number of cache get requests resulting in a cache hit." %}</span>
+                </td>
+            </tr>
+            <tr>
+                <th>{% trans "misses" %}</th>
+                <td><span id="cache_stats.misses">{{cache_stats.misses}}</span></td>
+                <td><span class="fieldsetcomment">{% trans "Number of cache get requests resulting in a cache miss." %}</span>
+                </td>
+            </tr>
+            <tr>
+                <th>{% trans "byte_hits" %}</th>
+                <td><span id="cache_stats.byte_hits">{{cache_stats.byte_hits}}</span></td>
+                <td><span class="fieldsetcomment">{% trans "Sum of bytes transferred on get requests. Rolls over to zero on overflow." %}</span>
+                </td>
+            </tr>
+            <tr>
+                <th>{% trans "items" %}</th>
+                <td><span id="cache_stats.items">{{cache_stats.items}}</span></td>
+                <td><span class="fieldsetcomment">{% trans "Number of key/value pairs in the cache." %} </span></td>
+            </tr>
+            <tr>
+                <th>{% trans "bytes" %}</th>
+                <td><span id="cache_stats.bytes">{{cache_stats.bytes}}</span></td>
+                <td><span class="fieldsetcomment">{% trans "Total size of all items in the cache." %}</span></td>
+            </tr>
+            <tr>
+                <th>{% trans "oldest_item_age" %}</th>
+                <td><span id="cache_stats.oldest_item_age">{{cache_stats.oldest_item_age}}</span></td>
+                <td><span class="fieldsetcomment">{% trans "How long in seconds since the oldest item in the cache was accessed. Effectively, this indicates how long a new item will survive in the cache without being accessed. This is _not_ the amount of time that has elapsed since the item was created." %}</span>
+                </td>
+            </tr>
+        </table>
+        <br>
+        <a href="javascript:flushAllMemcache(false);">{% trans "Refresh Memcache statistics" %}</a> &nbsp; &nbsp;
+        <a href="javascript:flushAllMemcache(true);">{% trans "Flush All the Memcache" %}</a>
+    </div>
+</fieldset>

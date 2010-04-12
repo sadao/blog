@@ -1,0 +1,118 @@
+{% load i18n %}
+{% extends "main.html" %}
+{% block title %}{{title}} - System Admin{% endblock %}
+{% block blogcontainer %}
+<!-- Connection Manager -->
+<script src="http://yui.yahooapis.com/2.7.0/build/connection/connection-min.js"></script>
+<!-- JSON Utility -->
+<script src="http://yui.yahooapis.com/2.7.0/build/json/json-min.js"></script>
+<!--DataTable-->
+<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.7.0/build/tabview/assets/skins/sam/tabview.css" />
+<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/element/element-min.js"></script>
+<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/datasource/datasource-min.js"></script>
+<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/datatable/datatable-min.js"></script>
+<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/paginator/paginator-min.js"></script> 
+<!--tabview-->
+<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/tabview/tabview-min.js"></script>
+<script type="text/javascript" src="/jscripts/yui-plugin-dispatcher-min.js"></script>
+<!--my yui grid render-->
+<script type="text/javascript" src="/jscripts/save.prototype.grid.js"></script>
+<!--<script type="text/javascript" src="/jscripts/csslist.grid.js"></script>-->
+<script type="text/javascript" src="/jscripts/common/constant.js"></script>
+<script type="text/javascript" src="/jscripts/common/utils.js"></script>
+{% block jscript %}
+{% endblock %}
+<div class="yui-g">
+    <div id="admincontainer" class=" yui-skin-sam">
+        <div id="adminmenu">
+        </div>
+        <script type="text/javascript">
+            (function() {
+                var tabView = new YAHOO.widget.TabView();
+
+                var systemTab = new YAHOO.widget.Tab({
+                    label: 'System',
+                    dataSrc: '/admin/system',
+                    cacheData: true,
+                    active: true
+                });
+
+                var dispatcher_conf = { // content configuration...
+                    relative:true  // the resources in the content (css/js) are relatives, and need path correction...
+                };
+                YAHOO.plugin.Dispatcher.delegate(systemTab,tabView,dispatcher_conf);
+
+                var pagesTab = new YAHOO.widget.Tab({
+                    label: 'Pages & Menus',
+                    dataSrc: '/admin/pages',
+                    cacheData: true
+                });
+                //tabView.addTab(pagesTab);
+                YAHOO.plugin.Dispatcher.delegate(pagesTab,tabView);
+
+                var albumsTab = new YAHOO.widget.Tab({
+                    label: 'Albums',
+                    dataSrc: '/admin/albums',
+                    cacheData: true
+                });
+                YAHOO.plugin.Dispatcher.delegate(albumsTab,tabView,dispatcher_conf);
+
+                var feedsTab = new YAHOO.widget.Tab({
+                    label: 'Feeds',
+                    dataSrc: '/admin/feeds',
+                    cacheData: true
+                });
+                YAHOO.plugin.Dispatcher.delegate(feedsTab,tabView,dispatcher_conf);
+
+                var imagesTab = new YAHOO.widget.Tab({
+                    label: 'Images',
+                    dataSrc: '/admin/images',
+                    cacheData: true
+                });
+                YAHOO.plugin.Dispatcher.delegate(imagesTab,tabView,dispatcher_conf);
+
+                var cssTab = new YAHOO.widget.Tab({
+                    label: 'CSS Files',
+                    dataSrc: '/admin/css',
+                    cacheData: true
+                });
+                //YAHOO.plugin.Dispatcher.delegate(cssTab,tabView,dispatcher_conf);
+
+
+                var tagsTab = new YAHOO.widget.Tab({
+                    label: 'Tags',
+                    dataSrc: '/admin/tags',
+                    cacheData: true
+                });
+                //YAHOO.plugin.Dispatcher.delegate(tagsTab,tabView,dispatcher_conf);
+
+                var archivesTab = new YAHOO.widget.Tab({
+                    label: 'Archives',
+                    dataSrc: '/admin/archives',
+                    cacheData: true
+                });
+                //YAHOO.plugin.Dispatcher.delegate(archivesTab,tabView,dispatcher_conf);
+
+                var authsubTab = new YAHOO.widget.Tab({
+                    label: 'AuthSub',
+                    dataSrc: '/admin/authsub',
+                    cacheData: true
+                });
+                //YAHOO.plugin.Dispatcher.delegate(authsubTab,tabView,dispatcher_conf);
+
+                var cacheTab = new YAHOO.widget.Tab({
+                    label: 'Cache',
+                    dataSrc: '/admin/cache',
+                    cacheData: true
+                });
+                YAHOO.plugin.Dispatcher.delegate(cacheTab,tabView,dispatcher_conf);
+
+                YAHOO.util.Event.onContentReady('adminmenu', function() {
+                    tabView.appendTo('adminmenu');
+                });               
+            })();
+        </script>
+    </div>
+</div>
+{% endblock %}
+
