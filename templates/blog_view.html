@@ -32,7 +32,7 @@
         </p><br>
         {% endif %}
         <P>
-            <SPAN class=post-author>{% blocktrans with blog.author as b_author%}Posted by {{ b_author }} at{% endblocktrans %}</SPAN>
+            <SPAN class=post-author>{% blocktrans with blog.author as b_author%}Posted by リンギオ at{% endblocktrans %}</SPAN>
                     <SPAN class=post-timestamp>
                         <A class=timestamp-link href="/{{blog.relative_permalink}}">{{blog.date|timezone:BLOG.time_zone_offset|date:"H:i A"}}</A>
                     </SPAN>
