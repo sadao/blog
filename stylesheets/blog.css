@@ -665,9 +665,9 @@ a.tag28, a.tag29, a.tag30 {
 
 /* added 2010/10/26 */
 blockquote{
-    background-color: #ededed;  /*背景色*/
-    padding: 5px 5px 5px 5px;  /*パディング幅（上・右・下・左）*/
-    border: #bbbbbb 1px solid;  /*まわりの枠（色・太さ・スタイル）*/
-    border-left: #bbbbbb 5px solid;  /*左の枠（色・太さ・スタイル）*/
-    margin: 3px 15px 3px 15px;  /*マージン幅（上・右・下・左）*/
+    background-color: #ededed;
+    padding: 5px 5px 5px 5px;
+    border: #bbbbbb 1px solid;
+    border-left: #bbbbbb 5px solid;
+    margin: 3px 15px 3px 15px;
 }
