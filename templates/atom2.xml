@@ -7,7 +7,7 @@
     <link href="{{ BLOG.root_url }}/atom" rel="self" />
     <updated>{{last_updated}}</updated>
     <author>
-      <name>リンギオ</name>
+      <name>{{ BLOG.author }}</name>
     </author>
 {% for entry in blogs %}
   <entry>
@@ -16,7 +16,7 @@
       <title><![CDATA[{{entry.title}}]]></title>
       <content type="html"><![CDATA[{{entry.content}}]]></content>
       <author>
-          <name>リンギオ</name>
+          <name>{{entry.author}}</name>
       </author>
       <updated>{{entry.formatted_date}}</updated>
   </entry>
