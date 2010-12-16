@@ -263,6 +263,11 @@ class AddBlogReaction(BaseRequestHandler):
             return True
 
     user = users.get_current_user()
+    # [Add] not login is no add reaction
+    if not user:
+        self.redirect('/'+blog.relative_permalink())
+        return
+
     if user is not None:
         blogReaction.author = user
         blogReaction.authorEmail = str(user.email())
